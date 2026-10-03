@@ -5,38 +5,23 @@ void setup()
 {
     Serial.begin(115200);
     Wire.begin(21, 22);
-    Serial.println("I2C Scanner");
+    Serial.println("BMP Chip ID test");
 }
 
 void loop()
 {
-    byte error;
-    int devices = 0;
+    Wire.beginTransmission(0x76);
+    Wire.write(0xD0);
+    Wire.endTransmission();
 
-    Serial.println("Scanning...");
+    Wire.requestFrom(0x76,1);
 
-    for (byte address = 1; address < 127; address++)
-    {
-        Wire.beginTransmission(address);
-        error = Wire.endTransmission();
+    if(Wire.available()){
+        byte ChipId = Wire.read();
 
-        if (error == 0)
-        {
-            Serial.print("I2C device found at 0x");
-            
-            if (address < 16)
-                Serial.print("0");
-
-            Serial.println(address, HEX);
-
-            devices++;
-        }
+        Serial.print("ChipId is 0x");
+        Serial.println(ChipId,HEX);
     }
-
-    if (devices == 0)
-        Serial.println("No I2C devices found.");
-
-    Serial.println("Scan complete.\n");
 
     delay(3000);
 }
